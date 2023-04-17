@@ -381,7 +381,7 @@ var raceTask = (function() {
         trackWidth: 600,
         initPos: settings.initPos,
         speed: 6,
-        shift: settings.difficulty == "hard" ? .4 : .2,
+        shift: settings.difficulty == "hard" ? .45 : .2,
         scale: 2.8,
         maxSpeed: 14,
         maxBoost: settings.maxBoost,
@@ -427,7 +427,6 @@ var raceTask = (function() {
 
     const zeroToExtremely = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>Extremely'];
     const zeroToALot = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>A lot'];
-    const notAtAllToExtremely = ['0<br>Not at all', '1', '2', '3', '4', '5', '6', '7', '8<br>Extremely'];
     const meanOfEffScale = ['-2<br>Strongly<br>Disagree', '-1<br>Disagree', '0<br>Neither agree<br>nor disagree', '1<br>Agree', '2<br>Strongly<br>Agree'];
 
     const saveSurveyData = (data) => {
@@ -504,9 +503,9 @@ var raceTask = (function() {
     function MakeEffortQs(name, style, round) {
         this.type = jsPsychSurveyLikert;
         this.questions = [
-            {prompt: `How effortful was <span class='${style}'>${name}</span>?`,
+            {prompt: `While playing <span class='${style}'>${name}</span>, how much effort did it feel like you were exerting?`,
             name: `effort`,
-            labels: notAtAllToExtremely},
+            labels: zeroToALot},
         ];
         this.randomize_question_order = false;
         this.scale_width = 500;
