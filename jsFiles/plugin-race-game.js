@@ -195,7 +195,8 @@ var jsPsychRaceGame = (function (jspsych) {
 
           // function for moving opponent's car
           const moveThem_func = function() {
-            let x0 = (trial.maxSpeed/(trial.maxBoost * trial.scale)) - 0.1428571;
+        //    let x0 = (trial.maxSpeed/(trial.maxBoost * trial.scale)) - 0.1428571;
+            let x0 = (trial.maxSpeed/(trial.maxBoost * trial.scale)) - 1.2;
             if (parseInt(myCar.style.left) != myLastPos) { theirSpeed = parseInt(myCar.style.left) - myLastPos };
             let pAccel = logit(Math.min(trial.maxSpeed/trial.boost, ipr), trial.scale, .7, trial.shift, x0);
             let accel = (Math.random() > pAccel) ? 1 : 0;

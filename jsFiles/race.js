@@ -1,5 +1,4 @@
 
-
 var raceTask = (function() {
 
 
@@ -34,7 +33,6 @@ var raceTask = (function() {
     *
     */
 
-    console.log(settings.difficulty, settings.effortOrder);
     p.intro = {}
 
     // html chunks
@@ -383,11 +381,12 @@ var raceTask = (function() {
         trackWidth: 600,
         initPos: settings.initPos,
         speed: 6,
-        shift: settings.difficulty == "hard" ? .4: 0,
+        shift: settings.difficulty == "hard" ? .4 : .2,
         scale: 2.8,
         maxSpeed: 14,
         maxBoost: settings.maxBoost,
         boost: jsPsych.timelineVariable('boost'),
+        data: {boost: jsPsych.timelineVariable('boost'), round: jsPsych.timelineVariable('round')},
         keys: ["e", "i"],
     };
 
@@ -403,18 +402,19 @@ var raceTask = (function() {
         },
         choices: "NO_KEYS",
         trial_duration: 2000,
+        data: {boost: jsPsych.timelineVariable('boost'), round: jsPsych.timelineVariable('round')},
     };
 
     p.task.block1 = {
         timeline: [race, prize],
-        repetitions: 5,
-        timeline_variables: [ { boost: [1, settings.maxBoost][settings.effortOrder] } ]
+        repetitions: 10,
+        timeline_variables: [ { boost: [1, settings.maxBoost][settings.effortOrder], round: 'R1' } ],
     };
 
     p.task.block2 = {
         timeline: [race, prize],
-        repetitions: 5,
-        timeline_variables: [ { boost: [1, settings.maxBoost][1 - settings.effortOrder] } ]
+        repetitions: 10,
+        timeline_variables: [ { boost: [1, settings.maxBoost][1 - settings.effortOrder], round: 'R2' } ],
     };
 
    /*
@@ -425,7 +425,230 @@ var raceTask = (function() {
 
     p.Qs = {};
 
+    const zeroToExtremely = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>Extremely'];
+    const zeroToALot = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>A lot'];
+    const notAtAllToExtremely = ['0<br>Not at all', '1', '2', '3', '4', '5', '6', '7', '8<br>Extremely'];
+    const meanOfEffScale = ['-2<br>Strongly<br>Disagree', '-1<br>Disagree', '0<br>Neither agree<br>nor disagree', '1<br>Agree', '2<br>Strongly<br>Agree'];
+
+    const saveSurveyData = (data) => {
+        const names = Object.keys(data.response);
+        const values = Object.values(data.response);
+        for(let i = 0; i < names.length; i++) {
+            data[names[i]] = values[i];
+        };      
+    };
+
+    function MakeFlowQs(name, style, round) {
+        this.type = jsPsychSurveyLikert;
+        this.preamble = 
+            `<div style='padding-top: 50px; width: 900px; font-size:16px'>
+                <p>Thank you for completing <span class='${style}'>${name}</span>!</strong></p>
+                <p>During <span class='${style}'>${name}</span>, to what extent did you feel immersed and engaged in what you were doing?
+                <br>Report how immersed and engaged you felt by answering the following questions.</p>
+            </div>`;
+        this.questions = [
+            {prompt: `During <span class='${style}'>${name}</span>, to what extent did you feel <strong>absorbed</strong> in what you were doing?`,
+            name: `absorbed`,
+            labels: zeroToExtremely},
+            {prompt: `During <span class='${style}'>${name}</span>, to what extent did you feel <strong>immersed</strong> in what you were doing?`,
+            name: `immersed`,
+            labels: zeroToExtremely},
+            {prompt: `During <span class='${style}'>${name}</span>, to what extent did you feel <strong>engaged</strong> in what you were doing?`,
+            name: `engaged`,
+            labels: zeroToExtremely},
+            {prompt: `During <span class='${style}'>${name}</span>, to what extent did you feel <strong>engrossed</strong> in what you were doing?`,
+            name: `engrossed`,
+            labels: zeroToExtremely},
+        ];
+        this.randomize_question_order = false;
+        this.scale_width = 500;
+        this.data = {round: round};
+        this.on_finish = (data) => {
+            saveSurveyData(data);    
+        };
+    };
+
+    function MakeEnjoyQs(name, style, round) {
+        this.type = jsPsychSurveyLikert;
+        this.preamble = 
+            `<div style='padding-top: 50px; width: 900px; font-size:16px'>
+                <p>Below are a few more questions about <span class='${style}'>${name}</span>.</p>
+                <p>Instead of asking about immersion and engagement, these questions ask about <strong>enjoyment</strong>.
+                <br>Report how much you <strong>enjoyed</strong> <span class='${style}'>${name}</span> by answering the following questions.</p>
+            </div>`;
+        this.questions = [
+            {prompt: `How much did you <strong>enjoy</strong> <span class='${style}'>${name}</span>?`,
+            name: `enjoyed`,
+            labels: zeroToALot},
+            {prompt: `How much did you <strong>like</strong> <span class='${style}'>${name}</span>?`,
+            name: `liked`,
+            labels: zeroToALot},
+            {prompt: `How much did you <strong>dislike</strong> <span class='${style}'>${name}</span>?`,
+            name: `disliked`,
+            labels: zeroToALot},
+            {prompt: `How much <strong>fun</strong> was <span class='${style}'>${name}</span>?`,
+            name: `fun`,
+            labels: zeroToALot},
+            {prompt: `How <strong>entertaining</strong> was <span class='${style}'>${name}</span>?`,
+            name: `entertained`,
+            labels: zeroToExtremely},
+        ];
+        this.randomize_question_order = false;
+        this.scale_width = 500;
+        this.data = {round: round};
+        this.on_finish = (data) => {
+            saveSurveyData(data);
+        };
+    };
+
+    function MakeEffortQs(name, style, round) {
+        this.type = jsPsychSurveyLikert;
+        this.questions = [
+            {prompt: `How effortful was <span class='${style}'>${name}</span>?`,
+            name: `effort`,
+            labels: notAtAllToExtremely},
+        ];
+        this.randomize_question_order = false;
+        this.scale_width = 500;
+        this.data = {round: round};
+        this.on_finish = (data) => {
+            saveSurveyData(data);      
+        };
+    };
+
+    p.Qs.flow1 = new MakeFlowQs(text.game1_name, text.game1_class, 'R1');
+
+    p.Qs.flow2 = new MakeFlowQs(text.game2_name, text.game2_class, 'R2');
+
+    p.Qs.enjoy1 = new MakeEnjoyQs(text.game1_name, text.game1_class, 'R1');
+
+    p.Qs.enjoy2 = new MakeEnjoyQs(text.game2_name, text.game2_class, 'R2');
+
+    p.Qs.effort1 = new MakeEffortQs(text.game1_name, text.game1_class, 'R1');
+
+    p.Qs.effort2 = new MakeEffortQs(text.game2_name, text.game2_class, 'R2');
+
+    p.Qs.demographics = (function() {
+
+        const demosIntro = {
+            type: jsPsychInstructions,
+            pages: [
+                `<div class='parent'>
+                    <p>Thank you for playing and evaluating our games!</p>
+                    <p>Next, you will finish the study by completing a few surveys.</p>
+                </div>`
+            ],
+            show_clickable_nav: true,
+        };
+
+        const meanOfEff = {
+            type: jsPsychSurveyLikert,
+            preamble:
+                `<div style='padding-top: 50px; width: 900px; font-size:16px'>
+                    <p>Thank you for playing and evaluating our games!</p>
+                    <p>Please answer the following questions as honestly and accurately as possible.</p>
+                </div>`,
+            questions: [
+                {prompt: `Pushing myself helps me see the bigger picture.`,
+                name: `meanOfEff_1`,
+                labels: meanOfEffScale},
+                {prompt: `I often don't understand why I am working so hard.`,
+                name: `meanOfEff_2r`,
+                labels: meanOfEffScale},
+                {prompt: `I learn the most about myself when I am trying my hardest.`,
+                name: `meanOfEff_3`,
+                labels: meanOfEffScale},
+                {prompt: `Things make more sense when I can put my all into them.`,
+                name: `meanOfEff_4`,
+                labels: meanOfEffScale},
+                {prompt: `When I work hard, it rarely makes a difference.`,
+                name: `meanOfEff_5r`,
+                labels: meanOfEffScale},
+                {prompt: `When I push myself, what I'm doing feels important.`,
+                name: `meanOfEff_6`,
+                labels: meanOfEffScale},
+                {prompt: `When I push myself, I feel like I'm part of something bigger than me.`,
+                name: `meanOfEff_7`,
+                labels: meanOfEffScale},
+                {prompt: `Doing my best gives me a clear purpose in life.`,
+                name: `meanOfEff_8`,
+                labels: meanOfEffScale},
+                {prompt: `When I try my hardest, my life has meaning.`,
+                name: `meanOfEff_9`,
+                labels: meanOfEffScale},
+                {prompt: `When I exert myself, I feel connected to my ideal life.`,
+                name: `meanOfEff_10`,
+                labels: meanOfEffScale},
+            ],
+            randomize_question_order: false,
+            scale_width: 500,
+            on_finish: (data) => {
+                saveSurveyData(data); 
+            },
+        };
+
+        const gender = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: '<p>What is your gender?</p>',
+            choices: ['Male', 'Female', 'Other'],
+            on_finish: (data) => {
+                data.gender = data.response;
+            }
+        };
+
+        const age = {
+            type: jsPsychSurveyText,
+            questions: [{prompt: "Age:", name: "age"}],
+            on_finish: (data) => {
+                saveSurveyData(data); 
+            },
+        }; 
+
+        const ethnicity = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: '<p>What is your race?</p>',
+            choices: ['White / Caucasian', 'Black / African American','Asian / Pacific Islander', 'Hispanic', 'Native American', 'Other'],
+            on_finish: (data) => {
+                data.ethnicity = data.response;
+            }
+        };
+
+        const english = {
+            type: jsPsychHtmlButtonResponse,
+            stimulus: '<p>Is English your native language?:</p>',
+            choices: ['Yes', 'No'],
+            on_finish: (data) => {
+                data.english = data.response;
+            }
+        };  
+
+        const finalWord = {
+            type: jsPsychSurveyText,
+            questions: [{prompt: "Questions? Comments? Complains? Provide your feedback here!", rows: 10, columns: 100, name: "finalWord"}],
+            on_finish: (data) => {
+                saveSurveyData(data); 
+            },
+        }; 
+
+
+        const demos = {
+            timeline: [demosIntro, meanOfEff, gender, age, ethnicity, english, finalWord]
+        };
+
+        return demos;
+
+    }());
 
     return p;
 
 }());
+
+
+// create timeline
+const timeline = [
+    raceTask.intro.r1, raceTask.task.block1, raceTask.Qs.flow1, raceTask.Qs.enjoy1, raceTask.Qs.effort1,
+    raceTask.intro.r2, raceTask.task.block2, raceTask.Qs.flow2, raceTask.Qs.enjoy2, raceTask.Qs.effort2,
+    raceTask.Qs.demographics, save_data];
+
+// initiate timeline
+jsPsych.run(timeline);
