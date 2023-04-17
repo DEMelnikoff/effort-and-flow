@@ -407,13 +407,13 @@ var raceTask = (function() {
 
     p.task.block1 = {
         timeline: [race, prize],
-        repetitions: 10,
+        repetitions: 20,
         timeline_variables: [ { boost: [1, settings.maxBoost][settings.effortOrder], round: 'R1' } ],
     };
 
     p.task.block2 = {
         timeline: [race, prize],
-        repetitions: 10,
+        repetitions: 20,
         timeline_variables: [ { boost: [1, settings.maxBoost][1 - settings.effortOrder], round: 'R2' } ],
     };
 
@@ -545,7 +545,6 @@ var raceTask = (function() {
             type: jsPsychSurveyLikert,
             preamble:
                 `<div style='padding-top: 50px; width: 900px; font-size:16px'>
-                    <p>Thank you for playing and evaluating our games!</p>
                     <p>Please answer the following questions as honestly and accurately as possible.</p>
                 </div>`,
             questions: [
