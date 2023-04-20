@@ -166,7 +166,7 @@ var exp = (function() {
             </div>`,
 
             `<div class='parent'>
-            <p>You'll earn a 5 cent bonus for each race you win.<br>
+            <p>You'll earn a ${settings.bonus} cent bonus for each race you win.<br>
             Specifically, ${settings.bonus} cents will be added to your bonus fund each time you cross the finish line before your opponent.</p>
             ${trackImg}
             </div>`,
