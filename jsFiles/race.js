@@ -1,5 +1,5 @@
 
-var raceTask = (function() {
+var exp = (function() {
 
 
     var p = {};
@@ -11,6 +11,7 @@ var raceTask = (function() {
         initPos: 50,
         trackWidth: 600,
         maxBoost: 3,
+        bonus: 3,
     };
 
     // condition-dependent text variables
@@ -32,8 +33,6 @@ var raceTask = (function() {
     *   INSTRUCTIONS
     *
     */
-
-    p.intro = {}
 
     // html chunks
     const trackImg = 
@@ -96,7 +95,7 @@ var raceTask = (function() {
             <p>You won!</p>
         </div>
         <div style="font-size: 70px; color:green">
-            <p>+5 Cents</p>
+            <p>+${settings.bonus} Cents</p>
         </div>`;
 
     const failureMessage = 
@@ -168,7 +167,7 @@ var raceTask = (function() {
 
             `<div class='parent'>
             <p>You'll earn a 5 cent bonus for each race you win.<br>
-            Specifically, 5 cents will be added to your bonus fund each time you cross the finish line before your opponent.</p>
+            Specifically, ${settings.bonus} cents will be added to your bonus fund each time you cross the finish line before your opponent.</p>
             ${trackImg}
             </div>`,
 
@@ -358,11 +357,11 @@ var raceTask = (function() {
     };
 
     // create instruction blocks
-    p.intro.r1 = {
+    p.intro_R1 = {
         timeline: [r1part1, attnChkLoop_part1, r1part3],
     };
 
-    p.intro.r2 = {
+    p.intro_R2 = {
         timeline: [r2part1, attnChkLoop_part2, r2part3],
     };
     
@@ -371,8 +370,6 @@ var raceTask = (function() {
     *   TASK
     *
     */
-
-    p.task = {}
 
     const race = {
         type: jsPsychRaceGame,
@@ -405,13 +402,13 @@ var raceTask = (function() {
         data: {boost: jsPsych.timelineVariable('boost'), round: jsPsych.timelineVariable('round')},
     };
 
-    p.task.block1 = {
+    p.task_R1 = {
         timeline: [race, prize],
         repetitions: 20,
         timeline_variables: [ { boost: [1, settings.maxBoost][settings.effortOrder], round: 'R1' } ],
     };
 
-    p.task.block2 = {
+    p.task_R2 = {
         timeline: [race, prize],
         repetitions: 20,
         timeline_variables: [ { boost: [1, settings.maxBoost][1 - settings.effortOrder], round: 'R2' } ],
@@ -422,8 +419,6 @@ var raceTask = (function() {
     *   QUESTIONS
     *
     */
-
-    p.Qs = {};
 
     const zeroToExtremely = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>Extremely'];
     const zeroToALot = ['0<br>A little', '1', '2', '3', '4', '5', '6', '7', '8<br>A lot'];
@@ -515,19 +510,19 @@ var raceTask = (function() {
         };
     };
 
-    p.Qs.flow1 = new MakeFlowQs(text.game1_name, text.game1_class, 'R1');
+    p.flow1 = new MakeFlowQs(text.game1_name, text.game1_class, 'R1');
 
-    p.Qs.flow2 = new MakeFlowQs(text.game2_name, text.game2_class, 'R2');
+    p.flow2 = new MakeFlowQs(text.game2_name, text.game2_class, 'R2');
 
-    p.Qs.enjoy1 = new MakeEnjoyQs(text.game1_name, text.game1_class, 'R1');
+    p.enjoy1 = new MakeEnjoyQs(text.game1_name, text.game1_class, 'R1');
 
-    p.Qs.enjoy2 = new MakeEnjoyQs(text.game2_name, text.game2_class, 'R2');
+    p.enjoy2 = new MakeEnjoyQs(text.game2_name, text.game2_class, 'R2');
 
-    p.Qs.effort1 = new MakeEffortQs(text.game1_name, text.game1_class, 'R1');
+    p.effort1 = new MakeEffortQs(text.game1_name, text.game1_class, 'R1');
 
-    p.Qs.effort2 = new MakeEffortQs(text.game2_name, text.game2_class, 'R2');
+    p.effort2 = new MakeEffortQs(text.game2_name, text.game2_class, 'R2');
 
-    p.Qs.demographics = (function() {
+    p.demographics = (function() {
 
         const demosIntro = {
             type: jsPsychInstructions,
@@ -603,11 +598,22 @@ var raceTask = (function() {
         }; 
 
         const ethnicity = {
-            type: jsPsychHtmlButtonResponse,
-            stimulus: '<p>What is your race?</p>',
-            choices: ['White / Caucasian', 'Black / African American','Asian / Pacific Islander', 'Hispanic', 'Native American', 'Other'],
+            type: jsPsychSurveyHtmlForm,
+            preamble: '<p>What is your race?</p>',
+            html: `<div style="text-align: left">
+            <p>White / Caucasian <input name="ethnicity" type="radio" value="white"/></p>
+            <p>Black / African American <input name="ethnicity" type="radio" value="black"/></p>
+            <p>East Asian (e.g., Chinese, Korean, Vietnamese, etc.) <input name="ethnicity" type="radio" value="east-asian"/></p>
+            <p>South Asian (e.g., Indian, Pakistani, Sri Lankan, etc.) <input name="ethnicity" type="radio" value="south-asian"/></p>
+            <p>Latino / Hispanic <input name="ethnicity" type="radio" value="hispanic"/></p>
+            <p>Middle Eastern / North African <input name="ethnicity" type="radio" value="middle-eastern"/></p>
+            <p>Indigenous / First Nations <input name="ethnicity" type="radio" value="indigenous"/></p>
+            <p>Bi-racial <input name="ethnicity" type="radio" value="indigenous"/></p>
+            <p>Other <input name="other" type="text"/></p>
+            </div>`,
             on_finish: (data) => {
-                data.ethnicity = data.response;
+                data.ethnicity = data.response.ethnicity;
+                data.other = data.response.other;
             }
         };
 
@@ -644,9 +650,9 @@ var raceTask = (function() {
 
 // create timeline
 const timeline = [
-    raceTask.intro.r1, raceTask.task.block1, raceTask.Qs.flow1, raceTask.Qs.enjoy1, raceTask.Qs.effort1,
-    raceTask.intro.r2, raceTask.task.block2, raceTask.Qs.flow2, raceTask.Qs.enjoy2, raceTask.Qs.effort2,
-    raceTask.Qs.demographics, save_data];
+    exp.intro_R1, exp.task_R1, exp.flow1, exp.enjoy1, exp.effort1,
+    exp.intro_R2, exp.task_R2, exp.flow2, exp.enjoy2, exp.effort2,
+    exp.demographics, save_data];
 
 // initiate timeline
 jsPsych.run(timeline);
