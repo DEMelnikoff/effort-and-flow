@@ -364,6 +364,12 @@ var exp = (function() {
     p.intro_R2 = {
         timeline: [r2part1, attnChkLoop_part2, r2part3],
     };
+
+    p.consent = {
+        type: jsPsychExternalHtml,
+        url: "./html/consent.html",
+        cont_btn: "advance",
+    };
     
    /*
     *
@@ -650,6 +656,7 @@ var exp = (function() {
 
 // create timeline
 const timeline = [
+    exp.consent,
     exp.intro_R1, exp.task_R1, exp.flow1, exp.enjoy1, exp.effort1,
     exp.intro_R2, exp.task_R2, exp.flow2, exp.enjoy2, exp.effort2,
     exp.demographics, save_data];
