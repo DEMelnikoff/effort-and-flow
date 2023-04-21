@@ -608,7 +608,7 @@ var exp = (function() {
 
         const ethnicity = {
             type: jsPsychSurveyHtmlForm,
-            preamble: '<p>What is your race?</p>',
+            preamble: '<p>What is your race / ethnicity?</p>',
             html: `<div style="text-align: left">
             <p>White / Caucasian <input name="ethnicity" type="radio" value="white"/></p>
             <p>Black / African American <input name="ethnicity" type="radio" value="black"/></p>
