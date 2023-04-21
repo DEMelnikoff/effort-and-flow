@@ -2,14 +2,20 @@ const completionCode = "CB1K8YPV";
 
 const jsPsych = initJsPsych({
     on_finish: () => {
+        const totalWins = jsPsych.data.get().filter({outcome: 1}).count();
+        const bonus = jsPsych.data.get().select('bonus').values[0]
+        const basePay = jsPsych.data.get().select('basePay').values[0]
+        const bonusEarnings = (totalWins * bonus) / 100
         document.body.innerHTML = 
         `<div align='center' style="margin: 10%">
-            <p>Thank you for participating!<p>
+            <p>Thank you for participating!
+            <br>You earned a total of <strong>$${bonusEarnings}</strong> in bonus money.
+            <br>You will receive your bonus, in addition to <strong>$${basePay}</strong> for your participation, within 48 hours.<p>
             <b>You will be automatically re-directed to Prolific in a few moments.</b>
         </div>`;
         setTimeout(() => { 
             location.href = `https://app.prolific.co/submissions/complete?cc=${completionCode}`
-        }, 2000)
+        }, 5000)
     }
 });
 

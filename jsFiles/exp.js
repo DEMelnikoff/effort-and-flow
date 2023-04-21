@@ -12,6 +12,7 @@ var exp = (function() {
         trackWidth: 600,
         maxBoost: 3,
         bonus: 3,
+        basePay: 2,
     };
 
     // condition-dependent text variables
@@ -26,6 +27,8 @@ var exp = (function() {
     jsPsych.data.addProperties({
         effortOrder: ["effort_first", "effort_second"][settings.effortOrder],
         difficulty: settings.difficulty,
+        bonus: settings.bonus,
+        basePay: settings.basePay,
     });
 
    /*
@@ -152,7 +155,7 @@ var exp = (function() {
             <p>The goal of the first game is to win as much money as possible.</p>
             <p>All of the money you win during the game will be added to
             a "bonus fund,"<br>which you'll receive at the end of the study.</p>
-            <p>Your total payment will be $1.50 for your participation, plus all of the money in your bonus fund.</p>
+            <p>Your total payment will be $${settings.basePay} for your participation, plus all of the money in your bonus fund.</p>
             </div>`],
 
             part2: [`<div class='parent'>

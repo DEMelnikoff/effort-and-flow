@@ -206,7 +206,6 @@ var jsPsychRaceGame = (function (jspsych) {
               if (nPerturb == 4) { perturb = perturb + (theirSpeed/2) };
               pPos = myPos + pInterval;
               nPerturb++;
-              console.log(pAccel, perturb);
             };
             theirPos = theirPos + perturb + theirSpeed;
             theirCar.style.left = theirPos + "px";
