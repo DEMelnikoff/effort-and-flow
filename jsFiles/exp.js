@@ -12,7 +12,7 @@ var exp = (function() {
         trackWidth: 600,
         maxBoost: 3,
         bonus: 3,
-        basePay: 2,
+        basePay: 2.20,
     };
 
     // condition-dependent text variables
